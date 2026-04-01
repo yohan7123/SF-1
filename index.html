@@ -1,0 +1,138 @@
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+
+const questions = [
+  {
+    q: "데이트에서 가장 중요한 것은?",
+    a: [
+      { text: "감정 교류", type: "romantic" },
+      { text: "재미와 활동", type: "fun" },
+      { text: "안정감", type: "stable" },
+      { text: "자유로운 분위기", type: "free" }
+    ]
+  },
+  {
+    q: "연락 스타일은?",
+    a: [
+      { text: "자주 연락", type: "romantic" },
+      { text: "필요할 때만", type: "free" },
+      { text: "적당히 꾸준히", type: "stable" },
+      { text: "재밌게 가볍게", type: "fun" }
+    ]
+  },
+  {
+    q: "싸웠을 때 나는?",
+    a: [
+      { text: "바로 풀고 싶다", type: "romantic" },
+      { text: "시간이 필요하다", type: "free" },
+      { text: "차분히 해결", type: "stable" },
+      { text: "분위기 전환", type: "fun" }
+    ]
+  },
+  {
+    q: "이상적인 연애는?",
+    a: [
+      { text: "영화 같은 사랑", type: "romantic" },
+      { text: "친구 같은 연애", type: "fun" },
+      { text: "결혼까지 생각", type: "stable" },
+      { text: "각자의 삶 존중", type: "free" }
+    ]
+  },
+  {
+    q: "선물 스타일은?",
+    a: [
+      { text: "감동적인 편지", type: "romantic" },
+      { text: "실용적인 것", type: "stable" },
+      { text: "재밌는 것", type: "fun" },
+      { text: "부담 없는 것", type: "free" }
+    ]
+  }
+];
+
+const results = {
+  romantic: {
+    title: "감성 몰입형",
+    desc: "사랑에 깊게 빠지는 타입. 감정 교류와 표현을 중요시함.",
+    match: "안정형"
+  },
+  fun: {
+    title: "유쾌 자유형",
+    desc: "재미와 설렘을 중시하는 밝은 연애 스타일.",
+    match: "감성형"
+  },
+  stable: {
+    title: "현실 안정형",
+    desc: "책임감 있고 장기적인 관계를 선호.",
+    match: "자유형"
+  },
+  free: {
+    title: "자유 존중형",
+    desc: "개인 시간을 중요시하는 독립적인 스타일.",
+    match: "안정형"
+  }
+};
+
+export default function App() {
+  const [step, setStep] = useState(0);
+  const [answers, setAnswers] = useState([]);
+
+  const handleAnswer = (type) => {
+    const newAnswers = [...answers, type];
+    setAnswers(newAnswers);
+    setStep(step + 1);
+  };
+
+  const getResult = () => {
+    const count = {};
+    answers.forEach((a) => {
+      count[a] = (count[a] || 0) + 1;
+    });
+    return Object.keys(count).reduce((a, b) => (count[a] > count[b] ? a : b));
+  };
+
+  if (step >= questions.length) {
+    const result = results[getResult()];
+    return (
+      <div className="flex items-center justify-center min-h-screen p-4">
+        <Card className="w-full max-w-md rounded-2xl shadow-xl">
+          <CardContent className="p-6 text-center">
+            <h2 className="text-2xl font-bold mb-4">{result.title}</h2>
+            <p className="mb-4">{result.desc}</p>
+            <p className="font-semibold">궁합 추천: {result.match}</p>
+            <Button className="mt-6" onClick={() => { setStep(0); setAnswers([]); }}>
+              다시하기
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const current = questions[step];
+
+  return (
+    <div className="flex items-center justify-center min-h-screen p-4">
+      <motion.div
+        key={step}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-md"
+      >
+        <Card className="rounded-2xl shadow-xl">
+          <CardContent className="p-6">
+            <h2 className="text-xl font-semibold mb-6">{current.q}</h2>
+            <div className="grid gap-3">
+              {current.a.map((option, i) => (
+                <Button key={i} onClick={() => handleAnswer(option.type)}>
+                  {option.text}
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
+  );
+}
